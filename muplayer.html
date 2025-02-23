@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHYTHMIQ Music Player</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* background: linear-gradient(to bottom right, #000000, #454545); */
+            background-color: black;
+            background: linear-gradient(to bottom right, #000000, #454545);
+            color: white;
+            min-height: 100vh;
+        }
+
+        nav {
+            background-color: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            list-style-type: none;
+            gap: 1rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 2rem;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background-color: rgba(242, 242, 242, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .player {
+            flex: 2;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .album-art {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .song-info {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .btn.play-pause {
+            background-color: white;
+            color: #FF1493;
+            padding: 1rem;
+            width: 50px;
+            height: 50px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 4px;
+            background-color: white;
+            border-radius: 0.5rem;
+            transition: width 0.1s linear;
+        }
+
+        .time {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.8rem;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .wishlist-btn.active {
+            color: #FF1493;
+        }
+
+        .tab-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            background: none;
+            border: none;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom-color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+
+
+        
+/* ... (keep your existing styles) */
+
+#allSongsList li, #wishlistSongs li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.download-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s;
+}
+
+.download-btn:hover {
+    color: #FF1493;
+}
+
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">RHYTHMIQ</div>
+        <ul>
+            <li><a href="#" id="homeBtn">Home</a></li>
+            <li><a href="#" id="feedbackBtn">Feedback</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h2>Top Artists</h2>
+            <ul id="artistList"></ul>
+        </div>
+
+        <div class="card player">
+            <img id="albumArt" src="https://cdn.djjaani.com/180x180/5780.jpg" alt="Album Art" class="album-art">
+            <div class="song-info">
+                <h3 id="songTitle">MoonLight</h3>
+                <p id="artistName">Harnoor</p>
+            </div>
+            <div class="progress-container" id="progressContainer">
+                <div id="progressBar" class="progress-bar"></div>
+            </div>
+            <div class="time">
+                <span id="currentTime">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="controls">
+                <button id="prevBtn" class="btn"><i class="fas fa-step-backward"></i></button>
+                <button id="playPauseBtn" class="btn play-pause"><i class="fas fa-play"></i></button>
+                <button id="nextBtn" class="btn"><i class="fas fa-step-forward"></i></button>
+                <button id="wishlistBtn" class="btn"><i class="fas fa-heart"></i></button>
+                <button id="repeatBtn" class="btn"><i class="fas fa-redo"></i></button>
+            </div>
+            <div class="volume-container">
+                <i class="fas fa-volume-up"></i>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
+            </div>
+            <audio id="audioPlayer" src="moonlight.mp3"></audio>
+        </div>
+
+        <div class="card">
+            <div class="tab-container">
+                <button class="tab active" id="allSongsTab">All Songs</button>
+                <button class="tab" id="wishlistTab">Wishlist</button>
+            </div>
+            <div id="allSongsContainer">
+                <ul id="allSongsList"></ul>
+            </div>
+            <div id="wishlistContainer" style="display: none;">
+                <ul id="wishlistSongs"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const repeatBtn = document.getElementById('repeatBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const artistList = document.getElementById('artistList');
+        const allSongsList = document.getElementById('allSongsList');
+        const wishlistBtn = document.getElementById('wishlistBtn');
+        const wishlistSongs = document.getElementById('wishlistSongs');
+        const allSongsTab = document.getElementById('allSongsTab');
+        const wishlistTab = document.getElementById('wishlistTab');
+        const allSongsContainer = document.getElementById('allSongsContainer');
+        const wishlistContainer = document.getElementById('wishlistContainer');
+
+        const songs = [
+            { id: 1, title: 'MoonLight', artist: 'Harnoor', src: 'moonlight.mp3', art: 'https://cdn.djjaani.com/180x180/5780.jpg' },
+            { id: 2, title: 'Tum Ho', artist: 'RockStar', src: 'tumHo.mp3', art: 'https://c.saavncdn.com/408/Rockstar-Hindi-2011-20221212023139-500x500.jpg' },
+            { id: 3, title: 'Baatein ye kabhi na', artist: 'Arjit Singh', src: 'BaateinYeKabhina.mp3', art: 'https://pagalfree.com/images/128Baatein%20Ye%20Kabhi%20Na%20(Male)%20-%20Khamoshiyan%20128%20Kbps.jpg' },
+            { id: 4, title: 'malang', artist: 'Siddarth,Shilpa Rao', src: 'malang.mp3', art: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYTmTBN9_X3l4iTRIGYj9r6h37l_bogd7qOQ&s' },
+            {id:5,title:'Pal ek Pal',artist:'Arjit Singh',src:'palEkPal.mp3',art:'https://c.saavncdn.com/208/Pal-From-Jalebi--Hindi-2018-20180912085100-500x500.jpg'},
+            { id: 6, title: 'Kabhi Kabhi Aditi', artist: 'Rashid Ali', src: 'kabhi2aditi.mp3', art: 'https://i1.sndcdn.com/artworks-GArwu8k4nmxqcByq-kGjdLg-t500x500.jpg' },
+            { id: 7, title: 'Tera Hone laga hu', artist: 'Atif Aslam', src: 'TeraHoneLagahu.mp3', art: 'https://pagalfree.com/images/128Tera%20Hone%20Laga%20Hoon%20-%20Ajab%20Prem%20Ki%20Ghazab%20Kahani%20128%20Kbps.jpg' },
+            { id: 8, title: 'Challa', artist: 'Rabbi Shergill', src: 'Challa.mp3', art: 'https://img.wynk.in/unsafe/200x200/filters:no_upscale():strip_exif():format(jpg)/http://s3.ap-south-1.amazonaws.com/wynk-music-cms/srch_unisysinfo/20230922141048000/0849486008274/1695456915322/resources/0849486008274.jpg' },
+            { id: 9, title: 'ITTEFAQ', artist: 'Siddant Chaturvedi', src: 'ITTEFAQ.mp3', art: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/64/a1/49/64a14938-6566-5f06-a77a-37a61663c048/198704003950_Cover.jpg/800x800cc.jpg' },
+            { id: 10, title: 'O Gujariya', artist: 'Shefali Alvares', src: 'Ogujariya.mp3', art: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR22w3RIszz3ZZHOA-s5GbG2vH0HkcspxNqJw&s' },
+        ];
+
+        const artists = ['Arjit Singh', 'Harnoor', 'Shilpa Rao', 'RockStar', 'Siddarth Mahadevan','Rashid ali', 'Rabbi Sherill', 'Atif Aslam', 'Siddant Chaturvedi', 'Shefali Alvares'];
+
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let isRepeat = false;
+        let wishlist = [];
+
+        function loadSong(index) {
+            const song = songs[index];
+            audioPlayer.src = song.src;
+            document.getElementById('songTitle').textContent = song.title;
+            document.getElementById('artistName').textContent = song.artist;
+            document.getElementById('albumArt').src = song.art;
+            updateWishlistButton();
+        }
+
+        function playSong() {
+            audioPlayer.play();
+            playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            isPlaying = true;
+        }
+
+        function pauseSong() {
+            audioPlayer.pause();
+            playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+            isPlaying = false;
+        }
+
+        function togglePlayPause() {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        }
+
+        function prevSong() {
+            currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+            loadSong(currentSongIndex);
+            if (isPlaying) playSong();
+        }
+
+        function nextSong() {
+            currentSongIndex = (currentSongIndex + 1) % songs.length;
+            loadSong(currentSongIndex);
+            if (isPlaying) playSong();
+        }
+
+        function updateProgress(e) {
+            const { currentTime, duration } = audioPlayer;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(currentTime);
+            durationEl.textContent = formatTime(duration);
+        }
+
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audioPlayer.duration;
+            audioPlayer.currentTime = (clickX / width) * duration;
+        }
+
+        function formatTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function toggleWishlist() {
+            const currentSong = songs[currentSongIndex];
+            const index = wishlist.findIndex(song => song.id === currentSong.id);
+            if (index === -1) {
+                wishlist.push(currentSong);
+            } else {
+                wishlist.splice(index, 1);
+            }
+            updateWishlistButton();
+            updateWishlistSongs();
+        }
+
+        function updateWishlistButton() {
+            const currentSong = songs[currentSongIndex];
+            if (wishlist.some(song => song.id === currentSong.id)) {
+                wishlistBtn.classList.add('active');
+            } else {
+                wishlistBtn.classList.remove('active');
+            }
+        }
+
+        function updateWishlistSongs() {
+            wishlistSongs.innerHTML = '';
+            wishlist.forEach(song => {
+                const li = document.createElement('li');
+                li.textContent = `${song.title} - ${song.artist}`;
+                li.addEventListener('click', () => {
+                    currentSongIndex = songs.findIndex(s => s.id === song.id);
+                    loadSong(currentSongIndex);
+                    playSong();
+                });
+                wishlistSongs.appendChild(li);
+            });
+        }
+
+        function updateAllSongsList() {
+            allSongsList.innerHTML = '';
+            songs.forEach((song, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${song.title} - ${song.artist}`;
+                li.addEventListener('click', () => {
+                    currentSongIndex = index;
+                    loadSong(currentSongIndex);
+                    playSong();
+                });
+                allSongsList.appendChild(li);
+            });
+        }
+
+        function updateArtistList() {
+            artistList.innerHTML = '';
+            artists.forEach(artist => {
+                const li = document.createElement('li');
+                li.textContent = artist;
+                li.addEventListener('click', () => {
+                    const songIndex = songs.findIndex(song => song.artist.includes(artist));
+                    if (songIndex !== -1) {
+                        currentSongIndex = songIndex;
+                        loadSong(currentSongIndex);
+                        playSong();
+                    }
+                });
+                artistList.appendChild(li);
+            });
+        }
+
+        // Event Listeners
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        prevBtn.addEventListener('click', prevSong);
+        nextBtn.addEventListener('click', nextSong);
+        repeatBtn.addEventListener('click', () => {
+            isRepeat = !isRepeat;
+            audioPlayer.loop = isRepeat;
+            repeatBtn.style.color = isRepeat ? '#FF1493' : 'white';
+        });
+        audioPlayer.addEventListener('timeupdate', updateProgress);
+        audioPlayer.addEventListener('ended', () => {
+            if (!isRepeat) nextSong();
+        });
+        progressContainer.addEventListener('click', setProgress);
+        volumeSlider.addEventListener('input', (e) => {
+            audioPlayer.volume = e.target.value;
+        });
+        wishlistBtn.addEventListener('click', toggleWishlist);
+
+        allSongsTab.addEventListener('click', () => {
+            allSongsTab.classList.add('active');
+            wishlistTab.classList.remove('active');
+            allSongsContainer.style.display = 'block';
+            wishlistContainer.style.display = 'none';
+        });
+
+        wishlistTab.addEventListener('click', () => {
+            wishlistTab.classList.add('active');
+            allSongsTab.classList.remove('active');
+            wishlistContainer.style.display = 'block';
+            allSongsContainer.style.display = 'none';
+        });
+
+        // Initialize
+        loadSong(currentSongIndex);
+        updateAllSongsList();
+        updateWishlistSongs();
+        updateArtistList();
+
+        
+// ... (keep your existing code)
+
+function updateAllSongsList() {
+    allSongsList.innerHTML = '';
+    songs.forEach((song, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${song.title} - ${song.artist}</span>
+            <button class="download-btn" data-src="${song.src}">
+                <i class="fas fa-download"></i>
+            </button>
+        `;
+        li.addEventListener('click', (e) => {
+            if (!e.target.closest('.download-btn')) {
+                currentSongIndex = index;
+                loadSong(currentSongIndex);
+                playSong();
+            }
+        });
+        allSongsList.appendChild(li);
+    });
+
+    // Add event listeners for download buttons
+    const downloadButtons = document.querySelectorAll('.download-btn');
+    downloadButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const src = e.target.closest('.download-btn').dataset.src;
+            downloadSong(src);
+        });
+    });
+}
+
+function downloadSong(src) {
+    const a = document.createElement('a');
+    a.href = src;
+    a.download = src.split('/').pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// ... (keep your existing code)
+
+// Make sure to call updateAllSongsList() in your initialization code
+updateAllSongsList();
+updateWishlistSongs();
+updateArtistList();
+
+
+        
+    </script>
+</body>
+</html>
